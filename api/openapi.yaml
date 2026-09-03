@@ -14,7 +14,7 @@ paths:
     get:
       tags:
         - Tasks
-      summary: Get all tasks
+      summary: Get all tasks from Api first yaml
       responses:
         '200':
           description: A list of tasks

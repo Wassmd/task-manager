@@ -14,3 +14,9 @@ logging:
     org:
       hibernate:
         SQL: DEBUG
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger
+    url: /openapi.yaml
