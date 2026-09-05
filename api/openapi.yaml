@@ -4,13 +4,13 @@ info:
   version: 1.0.0
 
 servers:
-  - url: '/api'
+  - url: '/'
 
 tags:
   - name: Tasks
 
 paths:
-  /tasks:
+  /api/v1/tasks:
     get:
       tags:
         - Tasks
@@ -60,7 +60,9 @@ components:
           type: string
           format: date
       required:
-        - [id, title, status, createdAt]
+        - id
+        - title
+        - status
 
     TaskStatus:
       type: string
