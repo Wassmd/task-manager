@@ -9,6 +9,11 @@ spring:
   jpa:
     open-in-view: false
     show-sql: true
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    locations: classpath:db/migration
+
 logging:
   level:
     org:

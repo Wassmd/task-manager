@@ -2,6 +2,8 @@ package com.paxier.task_manager_service.model;
 
 import com.paxier.task_manager_service.api.model.TaskStatus;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -15,7 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 @Entity
-@Table(name = "task")
+@Table(name = "task", schema = "task")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,6 +28,7 @@ public class TaskEntity {
   UUID id;
   String title;
   String description;
+  @Enumerated(EnumType.STRING)
   TaskStatus status;
   LocalDate dueDate;
 }

@@ -1,5 +1,6 @@
 package com.paxier.task_manager_service.repository;
 
+import static com.paxier.task_manager_service.api.model.TaskStatus.OPEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import com.paxier.task_manager_service.model.TaskEntity;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ class TaskRepositoryTest {
     TaskEntity task = TaskEntity.builder()
         .title("Test Task")
         .description("This is a test task")
-        .status(com.paxier.task_manager_service.api.model.TaskStatus.OPEN)
+        .status(OPEN)
         .build();
 
     TaskEntity savedEntity = taskRepository.save(task);
