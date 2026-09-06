@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import com.paxier.task_manager_service.api.model.Task;
+import com.paxier.task_manager_service.mapper.TaskMapper;
 import com.paxier.task_manager_service.model.TaskEntity;
 import com.paxier.task_manager_service.repository.TaskRepository;
 import java.time.LocalDate;
@@ -23,6 +24,9 @@ class TaskServiceTest {
 
   @Mock
   TaskRepository taskRepository;
+
+  @Mock
+  TaskMapper taskMapper;
 
   @InjectMocks
   private TaskService taskService;
@@ -44,6 +48,7 @@ class TaskServiceTest {
 
   @Test
   void createTask_savesTaskAndReturnsSavedTask() {
+    // given
     Task taskToCreate = new Task(null, "New Task", OPEN);
     taskToCreate.setDescription("This is a new task");
     taskToCreate.setDueDate(LocalDate.now().plusDays(7));
@@ -57,10 +62,18 @@ class TaskServiceTest {
         .dueDate(taskToCreate.getDueDate())
         .build();
 
-    given(taskRepository.save(any(TaskEntity.class))).willReturn(savedEntity);
+    Task expectedTask = new Task(savedEntity.getId(), savedEntity.getTitle(), savedEntity.getStatus());
+    expectedTask.setDescription(savedEntity.getDescription());
+    expectedTask.setDueDate(savedEntity.getDueDate());
 
+    given(taskRepository.save(any(TaskEntity.class))).willReturn(savedEntity);
+    given(taskMapper.toEntity(any(Task.class))).willReturn(savedEntity);
+    given(taskMapper.toApiModel(savedEntity)).willReturn(expectedTask);
+
+    // when
     Task createdTask = taskService.createTask(taskToCreate);
 
+    // then
     assertThat(createdTask).isNotNull();
     assertThat(createdTask.getId()).isEqualTo(savedEntity.getId());
     assertThat(createdTask.getTitle()).isEqualTo(taskToCreate.getTitle());

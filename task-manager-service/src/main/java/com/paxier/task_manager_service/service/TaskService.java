@@ -2,6 +2,7 @@ package com.paxier.task_manager_service.service;
 
 import com.paxier.task_manager_service.api.model.Task;
 import com.paxier.task_manager_service.api.model.TaskStatus;
+import com.paxier.task_manager_service.mapper.TaskMapper;
 import com.paxier.task_manager_service.model.TaskEntity;
 import com.paxier.task_manager_service.repository.TaskRepository;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 public class TaskService {
 
   private final TaskRepository taskRepository;
+  private final TaskMapper taskMapper;
 
   public List<Task> getTasks(){
     Task task1 = new Task(UUID.randomUUID(), "My first task", TaskStatus.OPEN);
@@ -26,18 +28,9 @@ public class TaskService {
   }
 
   public Task createTask(Task task) {
-    TaskEntity taskEntity = TaskEntity.builder()
-        .title(task.getTitle())
-        .status(task.getStatus())
-        .description(task.getDescription())
-        .dueDate(task.getDueDate())
-        .build();
+    TaskEntity taskEntity = taskMapper.toEntity(task);
 
     TaskEntity savedEntity = taskRepository.save(taskEntity);
-    Task savedTask = new Task(savedEntity.getId(), savedEntity.getTitle(), savedEntity.getStatus());
-    savedTask.setDescription(savedEntity.getDescription());
-    savedTask.setDueDate(savedEntity.getDueDate());
-
-    return savedTask;
+    return taskMapper.toApiModel(savedEntity);
   }
 }
