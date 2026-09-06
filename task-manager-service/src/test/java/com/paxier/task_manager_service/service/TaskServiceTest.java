@@ -49,7 +49,7 @@ class TaskServiceTest {
   @Test
   void createTask_savesTaskAndReturnsSavedTask() {
     // given
-    Task taskToCreate = new Task(null, "New Task", OPEN);
+    Task taskToCreate = new Task("New Task", OPEN);
     taskToCreate.setDescription("This is a new task");
     taskToCreate.setDueDate(LocalDate.now().plusDays(7));
 
@@ -62,9 +62,10 @@ class TaskServiceTest {
         .dueDate(taskToCreate.getDueDate())
         .build();
 
-    Task expectedTask = new Task(savedEntity.getId(), savedEntity.getTitle(), savedEntity.getStatus());
+    Task expectedTask = new Task(savedEntity.getTitle(), savedEntity.getStatus());
     expectedTask.setDescription(savedEntity.getDescription());
     expectedTask.setDueDate(savedEntity.getDueDate());
+    expectedTask.setId(savedEntity.getId());
 
     given(taskRepository.save(any(TaskEntity.class))).willReturn(savedEntity);
     given(taskMapper.toEntity(any(Task.class))).willReturn(savedEntity);

@@ -1,7 +1,6 @@
 package com.paxier.task_manager_service.service;
 
 import com.paxier.task_manager_service.api.model.Task;
-import com.paxier.task_manager_service.api.model.TaskStatus;
 import com.paxier.task_manager_service.mapper.TaskMapper;
 import com.paxier.task_manager_service.model.TaskEntity;
 import com.paxier.task_manager_service.repository.TaskRepository;
@@ -19,12 +18,15 @@ public class TaskService {
   private final TaskMapper taskMapper;
 
   public List<Task> getTasks(){
-    Task task1 = new Task(UUID.randomUUID(), "My first task", TaskStatus.OPEN);
-    task1.description("My first task description");
-    Task task2 = new Task(UUID.randomUUID(), "My second task", TaskStatus.OPEN);
-    task1.description("My second task description");
+    List<TaskEntity> taskEntities = taskRepository.findAll();
+    List<Task> tasks = new ArrayList<>();
 
-    return List.of(task1, task2);
+    for (TaskEntity entity : taskEntities) {
+      Task task = taskMapper.toApiModel(entity);
+      tasks.add(task);
+    }
+
+    return tasks;
   }
 
   public Task createTask(Task task) {

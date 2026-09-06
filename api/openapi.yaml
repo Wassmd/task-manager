@@ -60,7 +60,6 @@ components:
           type: string
           format: date
       required:
-        - id
         - title
         - status
 

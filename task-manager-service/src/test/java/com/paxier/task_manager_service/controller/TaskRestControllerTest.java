@@ -37,9 +37,9 @@ class TaskRestControllerTest {
 
   @Test
   void testGetAllTasks() throws Exception {
-    Task task1 = new Task(UUID.randomUUID(), "My first task", OPEN);
+    Task task1 = new Task("My first task", OPEN);
     task1.description("My first task description");
-    Task task2 = new Task(UUID.randomUUID(), "My second task", OPEN);
+    Task task2 = new Task("My second task", OPEN);
     task1.description("My second task description");
 
     List<Task> tasks = List.of(task1, task2);
@@ -63,9 +63,9 @@ class TaskRestControllerTest {
   }
 
   List<Task> getTasks() {
-    Task task1 = new Task(UUID.randomUUID(), "My first task", OPEN);
+    Task task1 = new Task( "My first task", OPEN);
     task1.description("My first task description");
-    Task task2 = new Task(UUID.randomUUID(), "My second task", OPEN);
+    Task task2 = new Task("My second task", OPEN);
     task1.description("My second task description");
 
     return List.of(task1, task2);
