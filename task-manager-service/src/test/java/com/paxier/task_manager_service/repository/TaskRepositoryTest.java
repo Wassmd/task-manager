@@ -26,6 +26,5 @@ class TaskRepositoryTest {
     assertThat(savedEntity).isNotNull();
     assertThat(savedEntity.getId()).isNotNull();
     assertThat(savedEntity.getTitle()).isEqualTo("Test Task");
-
   }
 }

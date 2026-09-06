@@ -5,7 +5,6 @@ import com.paxier.task_manager_service.api.model.Task;
 import com.paxier.task_manager_service.service.TaskService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
