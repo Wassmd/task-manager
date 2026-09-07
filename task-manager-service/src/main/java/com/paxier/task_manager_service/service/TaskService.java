@@ -18,15 +18,10 @@ public class TaskService {
   private final TaskMapper taskMapper;
 
   public List<Task> getTasks(){
-    List<TaskEntity> taskEntities = taskRepository.findAll();
-    List<Task> tasks = new ArrayList<>();
-
-    for (TaskEntity entity : taskEntities) {
-      Task task = taskMapper.toApiModel(entity);
-      tasks.add(task);
-    }
-
-    return tasks;
+    return taskRepository.findAll()
+        .stream()
+        .map(taskMapper::toApiModel)
+        .toList();
   }
 
   public Task createTask(Task task) {

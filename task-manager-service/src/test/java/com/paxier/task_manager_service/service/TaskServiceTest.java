@@ -1,6 +1,7 @@
 package com.paxier.task_manager_service.service;
 
 
+import static com.paxier.task_manager_service.api.model.TaskStatus.DONE;
 import static com.paxier.task_manager_service.api.model.TaskStatus.OPEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -33,17 +34,27 @@ class TaskServiceTest {
 
   @Test
   void getTasks_returnsTwoTasksWithExpectedTitlesAndStatus() {
+    given(taskRepository.findAll()).willReturn(List.of(
+        TaskEntity.builder().id(java.util.UUID.randomUUID()).title("My first task").status(OPEN).build(),
+        TaskEntity.builder().id(java.util.UUID.randomUUID()).title("My second task").status(DONE).build()
+    ));
+
+    given(taskMapper.toApiModel((any(TaskEntity.class)))).willAnswer(invocation -> {
+      TaskEntity entity = invocation.getArgument(0);
+      Task task = new Task(entity.getTitle(), entity.getStatus());
+      task.setId(entity.getId());
+      return task;
+    });
+
     List<Task> tasks = taskService.getTasks();
 
-    assertThat(tasks)
+   assertThat(tasks)
         .hasSize(2)
         .extracting(Task::getTitle, Task::getStatus)
         .containsExactlyInAnyOrder(
             tuple("My first task", OPEN),
-            tuple("My second task", OPEN)
+            tuple("My second task", DONE)
         );
-
-      assertThat(tasks.getFirst().getId()).isNotNull();
   }
 
   @Test
