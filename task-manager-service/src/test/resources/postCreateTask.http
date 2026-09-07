@@ -1,0 +1,9 @@
+POST http://localhost:8080/api/v1/tasks
+Content-Type: application/json
+
+{
+    "title": "Learn Cloud computing",
+    "status": "OPEN",
+    "description": "Log in to the cloud computing platform and complete the tutorial",
+    "dueDate": "2026-09-13"
+}

@@ -3,6 +3,7 @@ package com.paxier.task_manager_service.controller;
 import static com.paxier.task_manager_service.api.model.TaskStatus.OPEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -10,12 +11,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import com.paxier.task_manager_service.api.model.Task;
+import com.paxier.task_manager_service.config.SecurityConfig;
 import com.paxier.task_manager_service.service.TaskService;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -23,6 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
 @WebMvcTest(TaskRestController.class)
+@Import(SecurityConfig.class)
 @WithMockUser
 class TaskRestControllerTest {
 
@@ -69,5 +73,19 @@ class TaskRestControllerTest {
     task1.description("My second task description");
 
     return List.of(task1, task2);
+  }
+
+  @Test
+  void testPostCreateTask() {
+    given(taskService.createTask(any(Task.class)))
+        .willReturn(new Task("My first task", OPEN));
+
+    assertThat(mockMvcTester.post()
+        .uri("/api/v1/tasks")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content("{\"title\": \"My first task\", \"status\": \"OPEN\"}"))
+        .hasStatusOk()
+        .bodyJson()
+        .extractingPath("$.title").isEqualTo("My first task");
   }
 }

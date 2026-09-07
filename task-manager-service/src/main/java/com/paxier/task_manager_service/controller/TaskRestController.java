@@ -3,6 +3,7 @@ package com.paxier.task_manager_service.controller;
 import com.paxier.task_manager_service.api.TasksApi;
 import com.paxier.task_manager_service.api.model.Task;
 import com.paxier.task_manager_service.service.TaskService;
+import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ public class TaskRestController implements TasksApi {
 
   @Override
   public ResponseEntity<Task> apiV1TasksPost(Task task) {
-    return null;
+    Task savedTask = taskService.createTask(task);
+    return ResponseEntity.created(URI.create("/api/v1/tasks/" + savedTask.getId())).body(savedTask);
   }
 }
