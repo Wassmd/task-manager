@@ -9,7 +9,8 @@ Spring Boot REST service for managing tasks. API-contract-first via OpenAPI.
 - MapStruct, Lombok
 
 ## API
-See [`api/openapi.yaml`](api/openapi.yaml).
+API-first approach: [`api/openapi.yaml`](api/openapi.yaml) is the source of truth. Controller interfaces and DTO models are auto-generated at build time via `openapi-generator-maven-plugin` (packages `api` and `api.model`) — the controller implements the generated interface instead of hand-written contracts.
+
 Swagger UI: http://localhost:8080/swagger
 
 ## Monitoring
