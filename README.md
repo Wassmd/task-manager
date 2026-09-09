@@ -1,6 +1,6 @@
 # Task Manager
 
-Spring Boot REST-Service zur Verwaltung von Tasks. API-Contract-first via OpenAPI.
+Spring Boot REST service for managing tasks. API-contract-first via OpenAPI.
 
 ## Stack
 - Java 25, Spring Boot 4.1.1
@@ -8,19 +8,36 @@ Spring Boot REST-Service zur Verwaltung von Tasks. API-Contract-first via OpenAP
 - PostgreSQL, Flyway
 - MapStruct, Lombok
 
-## Struktur
-```
-api/                     OpenAPI-Spezifikation
-task-manager-service/    Spring Boot Anwendung
+## API
+See [`api/openapi.yaml`](api/openapi.yaml).
+Swagger UI: http://localhost:8080/swagger
+
+## Monitoring
+Grafana-compatible metrics via Actuator/Prometheus:
+- `/actuator/health`
+- `/actuator/metrics`
+- `/actuator/prometheus`
+
+## Architecture
+```mermaid
+flowchart LR
+    Client -->|REST/JSON| Service[task-manager-service]
+    Service -->|JDBC| DB[(PostgreSQL)]
 ```
 
-## Starten
+## Structure
+```
+api/                     OpenAPI specification
+task-manager-service/    Spring Boot application
+```
+
+## Run
 ```bash
 cd task-manager-service
 ./mvnw spring-boot:run
 ```
 
-Mit Docker Compose:
+With Docker Compose:
 ```bash
 cd task-manager-service
 docker compose up
@@ -31,6 +48,3 @@ docker compose up
 cd task-manager-service
 ./mvnw test
 ```
-
-## API
-Siehe [`api/openapi.yaml`](api/openapi.yaml).
