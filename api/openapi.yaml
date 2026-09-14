@@ -8,8 +8,32 @@ servers:
 
 tags:
   - name: Tasks
+  - name: TaskWatchers
 
 paths:
+  /api/v1/task-watcher:
+    post:
+      tags:
+        - TaskWatchers
+      summary: Add a watcher to a task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskWatcher'
+      responses:
+        '201':
+          description: Task watcher added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskWatcher'
+        '404':
+          description: Task not found
+        '409':
+          description: Watcher already exists for this task
+
   /api/v1/tasks:
     get:
       tags:
@@ -69,3 +93,20 @@ components:
         - OPEN
         - IN_PROGRESS
         - DONE
+
+    TaskWatcher:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        taskId:
+          type: string
+          format: uuid
+        emailId:
+          type: string
+          format: email
+      required:
+        - taskId
+        - emailId

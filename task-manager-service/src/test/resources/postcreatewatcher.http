@@ -1,0 +1,7 @@
+POST http://localhost:8080/api/v1/task-watcher
+Content-Type: application/json
+
+{
+  "emailId": "maryam@gmail.com",
+  "taskId": "61afa725-78c6-4d94-aea9-76da7addd557"
+}
