@@ -18,7 +18,7 @@ public class TaskService {
   private final TaskMapper taskMapper;
 
   public List<Task> getTasks(){
-    return taskRepository.findAll()
+    return taskRepository.findAllWithWatchers()
         .stream()
         .map(taskMapper::toApiModel)
         .toList();
