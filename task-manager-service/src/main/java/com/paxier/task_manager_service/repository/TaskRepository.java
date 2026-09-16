@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TaskRepository extends JpaRepository<TaskEntity, UUID> {
 
-  @Query("SELECT DISTINCT t FROM TaskEntity t LEFT JOIN FETCH t.watchers")
+  @Query("SELECT DISTINCT t FROM TaskEntity t LEFT JOIN FETCH t.watchers LEFT JOIN FETCH t.user")
   List<TaskEntity> findAllWithWatchers();
 }
 

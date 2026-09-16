@@ -9,6 +9,7 @@ servers:
 tags:
   - name: Tasks
   - name: TaskWatchers
+  - name: Users
 
 paths:
   /api/v1/task-watcher:
@@ -65,7 +66,77 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Task'
-  
+
+  /api/v1/users:
+    get:
+      tags:
+        - Users
+      summary: Get all users
+      responses:
+        '200':
+          description: A list of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      tags:
+        - Users
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /api/v1/users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Get a user by id
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: The requested user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+    delete:
+      tags:
+        - Users
+      summary: Deactivate a user (soft delete)
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: User deactivated successfully
+        '404':
+          description: User not found
+
 components:
   schemas:
     Task:
@@ -83,6 +154,12 @@ components:
         dueDate:
           type: string
           format: date
+        userId:
+          type: string
+          format: uuid
+        user:
+          $ref: "#/components/schemas/User"
+          readOnly: true
         watchers:
           type: array
           items:
@@ -90,6 +167,7 @@ components:
       required:
         - title
         - status
+        - userId
 
     TaskStatus:
       type: string
@@ -97,6 +175,28 @@ components:
         - OPEN
         - IN_PROGRESS
         - DONE
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        active:
+          type: boolean
+          readOnly: true
+      required:
+        - firstName
+        - lastName
+        - email
 
     TaskWatcher:
       type: object

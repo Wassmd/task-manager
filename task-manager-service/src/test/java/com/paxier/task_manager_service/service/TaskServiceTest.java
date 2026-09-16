@@ -11,9 +11,13 @@ import static org.mockito.BDDMockito.given;
 import com.paxier.task_manager_service.api.model.Task;
 import com.paxier.task_manager_service.mapper.TaskMapper;
 import com.paxier.task_manager_service.model.TaskEntity;
+import com.paxier.task_manager_service.model.UserEntity;
 import com.paxier.task_manager_service.repository.TaskRepository;
+import com.paxier.task_manager_service.repository.UserRepository;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,6 +31,9 @@ class TaskServiceTest {
   TaskRepository taskRepository;
 
   @Mock
+  UserRepository userRepository;
+
+  @Mock
   TaskMapper taskMapper;
 
   @InjectMocks
@@ -34,14 +41,14 @@ class TaskServiceTest {
 
   @Test
   void getTasks_returnsTwoTasksWithExpectedTitlesAndStatus() {
-    given(taskRepository.findAll()).willReturn(List.of(
+    given(taskRepository.findAllWithWatchers()).willReturn(List.of(
         TaskEntity.builder().id(java.util.UUID.randomUUID()).title("My first task").status(OPEN).build(),
         TaskEntity.builder().id(java.util.UUID.randomUUID()).title("My second task").status(DONE).build()
     ));
 
     given(taskMapper.toApiModel((any(TaskEntity.class)))).willAnswer(invocation -> {
       TaskEntity entity = invocation.getArgument(0);
-      Task task = new Task(entity.getTitle(), entity.getStatus());
+      Task task = new Task(entity.getTitle(), entity.getStatus(), UUID.randomUUID());
       task.setId(entity.getId());
       return task;
     });
@@ -60,9 +67,13 @@ class TaskServiceTest {
   @Test
   void createTask_savesTaskAndReturnsSavedTask() {
     // given
-    Task taskToCreate = new Task("New Task", OPEN);
+    UUID userId = UUID.randomUUID();
+    Task taskToCreate = new Task("New Task", OPEN, userId);
     taskToCreate.setDescription("This is a new task");
     taskToCreate.setDueDate(LocalDate.now().plusDays(7));
+
+    UserEntity user = UserEntity.builder().id(userId).firstName("John").lastName("Doe")
+        .email("john@doe.com").active(true).build();
 
     // Mock the behavior of the repository to return a saved entity with an ID
     TaskEntity savedEntity = TaskEntity.builder()
@@ -73,11 +84,12 @@ class TaskServiceTest {
         .dueDate(taskToCreate.getDueDate())
         .build();
 
-    Task expectedTask = new Task(savedEntity.getTitle(), savedEntity.getStatus());
+    Task expectedTask = new Task(savedEntity.getTitle(), savedEntity.getStatus(), userId);
     expectedTask.setDescription(savedEntity.getDescription());
     expectedTask.setDueDate(savedEntity.getDueDate());
     expectedTask.setId(savedEntity.getId());
 
+    given(userRepository.findById(userId)).willReturn(Optional.of(user));
     given(taskRepository.save(any(TaskEntity.class))).willReturn(savedEntity);
     given(taskMapper.toEntity(any(Task.class))).willReturn(savedEntity);
     given(taskMapper.toApiModel(savedEntity)).willReturn(expectedTask);
