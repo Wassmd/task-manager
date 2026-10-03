@@ -41,9 +41,9 @@ class TaskRestControllerTest {
 
   @Test
   void testGetAllTasks() throws Exception {
-    Task task1 = new Task("My first task", OPEN, java.util.UUID.randomUUID());
+    Task task1 = new Task("My first task", OPEN );
     task1.description("My first task description");
-    Task task2 = new Task("My second task", OPEN, java.util.UUID.randomUUID());
+    Task task2 = new Task("My second task", OPEN);
     task1.description("My second task description");
 
     List<Task> tasks = List.of(task1, task2);
@@ -67,9 +67,9 @@ class TaskRestControllerTest {
   }
 
   List<Task> getTasks() {
-    Task task1 = new Task( "My first task", OPEN, java.util.UUID.randomUUID());
+    Task task1 = new Task( "My first task", OPEN);
     task1.description("My first task description");
-    Task task2 = new Task("My second task", OPEN, java.util.UUID.randomUUID());
+    Task task2 = new Task("My second task", OPEN);
     task1.description("My second task description");
 
     return List.of(task1, task2);
@@ -78,7 +78,7 @@ class TaskRestControllerTest {
   @Test
   void testPostCreateTask() {
     given(taskService.createTask(any(Task.class)))
-        .willReturn(new Task("My first task", OPEN, java.util.UUID.randomUUID()));
+        .willReturn(new Task("My first task", OPEN));
 
     assertThat(mockMvcTester.post()
         .uri("/api/v1/tasks")

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
@@ -117,54 +118,17 @@ public class ReweReport {
   // ===== KOMPLEXERE AUFGABEN MIT ZWEI STREAMS =====
   @Test
   void testCalculateTotalSavingPerPromotion() {
-    // Get all the products per promotion
-    Map<Integer, Set<PromotionItem>> itemsPerPromotion = promotionItems
-        .stream()
-        .collect(groupingBy(PromotionItem::promotionId, toSet()));
+    Map<Integer, Product> productById = products.stream()
+        .collect(toMap(p -> p.id, p -> p));
 
-    //Get the sum of PromotionItems Price in a Promotion
-    Map<Integer, BigDecimal> sumOfPricesInAPromotion = itemsPerPromotion
-        .entrySet()
-        .stream()
-        .collect(toMap(Map.Entry::getKey, entry -> entry
-            .getValue()
-            .stream()
-            .map(PromotionItem::promotionPrice)
-            .reduce(BigDecimal.ZERO, BigDecimal::add)
-        ));
+    //Easy way
+    var savingsProPromotion = promotionItems.stream()
+        .collect(groupingBy(PromotionItem::promotionId, mapping(
+            item -> productById.get(item.productId).price.subtract(item.promotionPrice),
+            reducing(BigDecimal.ZERO, BigDecimal::add)
+        )));
 
-    //Get all sum of all normal price of the Item in a Promotion
-    BigDecimal normalAmount;
-
-    var sumOfPromotionItemsWithNormalPrice = itemsPerPromotion
-        .entrySet()
-        .stream()
-        .collect(toMap(Map.Entry::getKey, entry ->
-            entry
-                .getValue()
-                .stream()
-                .flatMap(p ->
-                    products
-                        .stream()
-                        .filter(pr -> pr.id == p.id)
-
-                )
-                .map(Product::price)
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-
-            ));
-
-    IO.println(itemsPerPromotion);
-    IO.println(sumOfPricesInAPromotion);
-    IO.println(sumOfPromotionItemsWithNormalPrice);
-
-    // saving per promotion
-    var savings = sumOfPromotionItemsWithNormalPrice
-        .entrySet()
-        .stream()
-        .collect(toMap(Map.Entry::getKey, entry -> entry.getValue().subtract(sumOfPricesInAPromotion.get(entry.getKey()))));
-
-    IO.println(savings);
+    IO.println(savingsProPromotion);
   }
 
 }

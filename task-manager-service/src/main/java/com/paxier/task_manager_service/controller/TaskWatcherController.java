@@ -1,5 +1,7 @@
 package com.paxier.task_manager_service.controller;
 
+import com.paxier.task_manager_service.api.TaskWatchersApi;
+import com.paxier.task_manager_service.api.model.TaskWatcher;
 import com.paxier.task_manager_service.model.TaskWatcherDTO;
 import com.paxier.task_manager_service.service.TaskService;
 import com.paxier.task_manager_service.service.TaskWatcherService;
@@ -14,24 +16,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/v1/task-watcher")
 @RequiredArgsConstructor
-public class TaskWatcherController {
+public class TaskWatcherController implements TaskWatchersApi {
   private final TaskWatcherService taskWatcherService;
 
-
-  @PostMapping
-  public ResponseEntity<String> addTaskWatcher(@Valid @RequestBody TaskWatcherRequest request) {
-    TaskWatcherDTO taskWatcherDTO = convertToDTO(request);
+  @Override
+  public ResponseEntity<TaskWatcher> apiV1TaskWatcherPost(TaskWatcher taskWatcher) {
+    TaskWatcherDTO taskWatcherDTO = convertToDTO(taskWatcher);
 
     taskWatcherService.addTaskWatcher(taskWatcherDTO);
-    return ResponseEntity.created(URI.create("/api/v1/task-watcher/" + taskWatcherDTO.getTaskId() + "/" + taskWatcherDTO.getEmail())).body("Task watcher added successfully");
+    return ResponseEntity.
+        created(URI.create("/api/v1/task-watcher/" + taskWatcherDTO.getTaskId() + "/" + taskWatcherDTO.getEmail()))
+            .body(taskWatcher);
   }
 
-  private TaskWatcherDTO convertToDTO(TaskWatcherRequest request) {
+  private TaskWatcherDTO convertToDTO(TaskWatcher taskWatcher) {
     return TaskWatcherDTO.builder()
-        .email(request.getEmailId())
-        .taskId(request.getTaskId())
+        .email(taskWatcher.getEmailId())
+        .taskId(taskWatcher.getTaskId())
         .build();
   }
 }

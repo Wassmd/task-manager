@@ -167,7 +167,6 @@ components:
       required:
         - title
         - status
-        - userId
 
     TaskStatus:
       type: string

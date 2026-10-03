@@ -48,7 +48,7 @@ class TaskServiceTest {
 
     given(taskMapper.toApiModel((any(TaskEntity.class)))).willAnswer(invocation -> {
       TaskEntity entity = invocation.getArgument(0);
-      Task task = new Task(entity.getTitle(), entity.getStatus(), UUID.randomUUID());
+      Task task = new Task(entity.getTitle(), entity.getStatus());
       task.setId(entity.getId());
       return task;
     });
@@ -68,7 +68,7 @@ class TaskServiceTest {
   void createTask_savesTaskAndReturnsSavedTask() {
     // given
     UUID userId = UUID.randomUUID();
-    Task taskToCreate = new Task("New Task", OPEN, userId);
+    Task taskToCreate = new Task("New Task", OPEN);
     taskToCreate.setDescription("This is a new task");
     taskToCreate.setDueDate(LocalDate.now().plusDays(7));
 
@@ -84,7 +84,7 @@ class TaskServiceTest {
         .dueDate(taskToCreate.getDueDate())
         .build();
 
-    Task expectedTask = new Task(savedEntity.getTitle(), savedEntity.getStatus(), userId);
+    Task expectedTask = new Task(savedEntity.getTitle(), savedEntity.getStatus());
     expectedTask.setDescription(savedEntity.getDescription());
     expectedTask.setDueDate(savedEntity.getDueDate());
     expectedTask.setId(savedEntity.getId());
