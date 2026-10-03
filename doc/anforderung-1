@@ -1,0 +1,24 @@
+Anwendungsfälle (Use Cases) für die Datenstruktur:
+1.
+Aktionsübersicht pro Zeitraum — alle Aktionen einer Kalenderwoche auflisten (Filter über start/end).
+2.
+Ersparnis je Artikel — pro PromotionItem: product.price() − promoPrice(), mal quantity → Rabatt in €.
+3.
+Rabatt in Prozent — (price − promoPrice) / price × 100 je Artikel.
+4.
+Aktionswert gesamt — Summe promoPrice × quantity aller items einer Promotion.
+5.
+Meistrabattierte Produkte — über alle Aktionen hinweg nach Ersparnis sortieren.
+6.
+Produkt-Historie — in welchen Aktionen kam ein Product vor?
+
+1. ⏳ Understanding: Two Streams with Savings & Average Discount
+2. ⏳ Implementing: Reduce Function for Total Revenue
+3. ⏳ Implementing: Average Price Comparison (2 Streams)
+4. ⏳ Implementing: GroupBy with Sum per Category
+5. ⏳ Implementing: Complex Map & Filter Operations
+6. ⏳ Implementing: Merge Two Streams for Statistics
+7. ⏳ Implementing: GroupBy with MaxBy & CollectingAndThen
+8. ⏳ Implementing: Calculate Promotion ROI
+9. ⏳ Testing: Run and Verify All Tests
+10. ⏳ Optimization: Refactor & Optimize Stream Chains

@@ -24,7 +24,7 @@ public class TaskWatcherController {
   public ResponseEntity<String> addTaskWatcher(@Valid @RequestBody TaskWatcherRequest request) {
     TaskWatcherDTO taskWatcherDTO = convertToDTO(request);
 
-    taskWatcherService.addTaskWatcher(convertToDTO(request));
+    taskWatcherService.addTaskWatcher(taskWatcherDTO);
     return ResponseEntity.created(URI.create("/api/v1/task-watcher/" + taskWatcherDTO.getTaskId() + "/" + taskWatcherDTO.getEmail())).body("Task watcher added successfully");
   }
 
