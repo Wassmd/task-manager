@@ -1,7 +1,9 @@
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
@@ -113,5 +115,56 @@ public class ReweReport {
   }
 
   // ===== KOMPLEXERE AUFGABEN MIT ZWEI STREAMS =====
+  @Test
+  void testCalculateTotalSavingPerPromotion() {
+    // Get all the products per promotion
+    Map<Integer, Set<PromotionItem>> itemsPerPromotion = promotionItems
+        .stream()
+        .collect(groupingBy(PromotionItem::promotionId, toSet()));
+
+    //Get the sum of PromotionItems Price in a Promotion
+    Map<Integer, BigDecimal> sumOfPricesInAPromotion = itemsPerPromotion
+        .entrySet()
+        .stream()
+        .collect(toMap(Map.Entry::getKey, entry -> entry
+            .getValue()
+            .stream()
+            .map(PromotionItem::promotionPrice)
+            .reduce(BigDecimal.ZERO, BigDecimal::add)
+        ));
+
+    //Get all sum of all normal price of the Item in a Promotion
+    BigDecimal normalAmount;
+
+    var sumOfPromotionItemsWithNormalPrice = itemsPerPromotion
+        .entrySet()
+        .stream()
+        .collect(toMap(Map.Entry::getKey, entry ->
+            entry
+                .getValue()
+                .stream()
+                .flatMap(p ->
+                    products
+                        .stream()
+                        .filter(pr -> pr.id == p.id)
+
+                )
+                .map(Product::price)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+
+            ));
+
+    IO.println(itemsPerPromotion);
+    IO.println(sumOfPricesInAPromotion);
+    IO.println(sumOfPromotionItemsWithNormalPrice);
+
+    // saving per promotion
+    var savings = sumOfPromotionItemsWithNormalPrice
+        .entrySet()
+        .stream()
+        .collect(toMap(Map.Entry::getKey, entry -> entry.getValue().subtract(sumOfPricesInAPromotion.get(entry.getKey()))));
+
+    IO.println(savings);
+  }
 
 }
