@@ -10,12 +10,13 @@ import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition;
 
 /**
- * Enforces the hexagonal (ports & adapters) architecture of the task-manager-service.
+ * Enforces the feature-based hexagonal (ports & adapters) architecture.
  *
- * <p>Layer directions:
- * {@code domain <- application <- adapter}, with {@code config} wiring everything together.
- * The generated {@code api} package is intentionally excluded from the layer checks
- * (it is a framework-neutral transport shared by core and adapters).
+ * <p>Two features ({@code task} incl. its task-watcher, and {@code user}) are each organised as a
+ * hexagon ({@code domain <- application <- adapter}). The only inter-feature dependency is
+ * {@code user -> task}, created by {@code UserExistenceAdapter} implementing the task feature's
+ * {@code UserExistencePort} (dependency inversion). The generated {@code api} package is a shared,
+ * framework-neutral transport and is intentionally excluded from the layer checks.
  */
 @AnalyzeClasses(
     packages = "com.paxier.task_manager_service",
@@ -25,8 +26,8 @@ class HexagonalArchitectureTest {
   private static final String BASE = "com.paxier.task_manager_service";
 
   /**
-   * The primary requirement: no cyclic dependencies between the top-level modules
-   * (adapter, application, domain, api, config).
+   * The primary requirement: no cyclic dependencies between the top-level slices
+   * (task, user, config, shared, api).
    */
   @ArchTest
   static final ArchRule no_cyclic_dependencies_between_slices =
@@ -34,15 +35,15 @@ class HexagonalArchitectureTest {
           .matching(BASE + ".(*)..")
           .should().beFreeOfCycles();
 
-  /** Hexagon layering: adapters depend on the core, never the other way around. */
+  /** Hexagon layering (applies within every feature): adapters depend on the core, never reversed. */
   @ArchTest
   static final ArchRule hexagonal_layering =
       layeredArchitecture()
           .consideringOnlyDependenciesInLayers()
-          .layer("Domain").definedBy(BASE + ".domain..")
-          .layer("Application").definedBy(BASE + ".application..")
-          .layer("Adapters").definedBy(BASE + ".adapter..")
-          .layer("Config").definedBy(BASE + ".config..")
+          .layer("Domain").definedBy("..domain..")
+          .layer("Application").definedBy("..application..")
+          .layer("Adapters").definedBy("..adapter..")
+          .layer("Config").definedBy("..config..")
 
           .whereLayer("Adapters").mayNotBeAccessedByAnyLayer()
           .whereLayer("Application").mayOnlyBeAccessedByLayers("Adapters", "Config")
@@ -52,7 +53,7 @@ class HexagonalArchitectureTest {
   @ArchTest
   static final ArchRule application_is_free_of_frameworks =
       ArchRuleDefinition.noClasses()
-          .that().resideInAPackage(BASE + ".application..")
+          .that().resideInAPackage("..application..")
           .should().dependOnClassesThat()
           .resideInAnyPackage(
               "org.springframework.web..",
@@ -64,22 +65,48 @@ class HexagonalArchitectureTest {
   @ArchTest
   static final ArchRule domain_depends_on_nothing_inward =
       ArchRuleDefinition.noClasses()
-          .that().resideInAPackage(BASE + ".domain..")
+          .that().resideInAPackage("..domain..")
           .should().dependOnClassesThat()
-          .resideInAnyPackage(BASE + ".application..", BASE + ".adapter..")
+          .resideInAnyPackage("..application..", "..adapter..")
           .because("the domain is the innermost layer");
 
-  /** Use-case implementations belong to the application.service package. */
+  /**
+   * The {@code task} feature must never depend on the {@code user} feature. The relationship is
+   * inverted via {@code UserExistencePort}, so the only compile-time edge is {@code user -> task}.
+   */
+  @ArchTest
+  static final ArchRule task_feature_does_not_depend_on_user_feature =
+      ArchRuleDefinition.noClasses()
+          .that().resideInAPackage(BASE + ".task..")
+          .should().dependOnClassesThat().resideInAPackage(BASE + ".user..")
+          .because("the task -> user dependency is inverted through UserExistencePort");
+
+  /**
+   * The {@code user} feature may only reach the {@code task} feature through its ports, never through
+   * task-internal domain, services, or adapters.
+   */
+  @ArchTest
+  static final ArchRule user_feature_only_touches_task_through_ports =
+      ArchRuleDefinition.noClasses()
+          .that().resideInAPackage(BASE + ".user..")
+          .should().dependOnClassesThat()
+          .resideInAnyPackage(
+              BASE + ".task.domain..",
+              BASE + ".task.application.service..",
+              BASE + ".task.adapter..")
+          .because("features must communicate only through published ports");
+
+  /** Use-case implementations belong to an application.service package. */
   @ArchTest
   static final ArchRule services_reside_in_application_service =
       ArchRuleDefinition.classes()
           .that().haveSimpleNameEndingWith("Service")
-          .should().resideInAPackage(BASE + ".application.service..");
+          .should().resideInAPackage("..application.service..");
 
-  /** Persistence adapters implement outbound ports and live in the persistence package. */
+  /** Persistence adapters live in a persistence package. */
   @ArchTest
   static final ArchRule persistence_adapters_reside_in_persistence_package =
       ArchRuleDefinition.classes()
           .that().haveSimpleNameEndingWith("PersistenceAdapter")
-          .should().resideInAPackage(BASE + ".adapter.out.persistence..");
+          .should().resideInAPackage("..adapter.out.persistence..");
 }
